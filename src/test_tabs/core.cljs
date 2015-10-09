@@ -19,23 +19,27 @@
                                             {x ""}))
                                         ids)))]
     (fn [tabs model on-change data]
-      [:div
-       [rcc/horizontal-tabs
-        :tabs tabs
-        :model model
-        :on-change (fn [x]
-                     (on-change x)
-                     (when-not (= x model)
-                       (swap! states assoc model "")
-                       (js/setTimeout #(swap! states assoc x "active in") TRANSITION-DURATION)))]
-       [:div.tab-content
-        (doall
-         (for [[k v] data]
-           ^{:key k}
-           [:div.tab-pane.fade
-            {:class (k @states)}
-            v]))]])))
-
+      [rcc/v-box
+       :margin "20px"
+       :children [[rcc/title
+                   :label "Tabs with animation"
+                   :level :level1]
+                  [rcc/horizontal-tabs
+                   :tabs tabs
+                   :model model
+                   :on-change (fn [x]
+                                (on-change x)
+                                (when-not (= x model)
+                                  (swap! states assoc model "")
+                                  (js/setTimeout #(swap! states assoc x "active in") TRANSITION-DURATION)))]
+                  [rcc/v-box
+                   :class "tab-content"
+                   :children (doall
+                              (for [[k v] data]
+                                ^{:key k}
+                                [rcc/box
+                                 :class (str "tab-pane fade " (k @states))
+                                 :child v]))]]])))
 
 (defn hello-world
   []
