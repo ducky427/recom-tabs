@@ -28,15 +28,14 @@
                                   (swap! states assoc model "")
                                   (js/setTimeout #(swap! states assoc x "active in")
                                                  TRANSITION-DURATION)))]
-                  [rcc/v-box
-                   :class "tab-content"
-                   :children (doall
-                              (for [t  tabs
-                                    :let [k (:id t)]]
-                                ^{:key k}
-                                [rcc/box
-                                 :class (str "tab-pane fade " (k @states))
-                                 :child (:content t)]))]]])))
+                  [:div.tab-content
+                   (doall
+                    (for [t  tabs
+                          :let [k (:id t)]]
+                      ^{:key k}
+                      [rcc/box
+                       :class (str "tab-pane fade " (k @states))
+                       :child (:content t)]))]]])))
 
 (defn hello-world
   []
