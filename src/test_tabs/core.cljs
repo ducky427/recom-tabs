@@ -6,6 +6,7 @@
 
 (defonce app-state (reagent/atom :a))
 
+;; https://github.com/twbs/bootstrap/blob/master/js/tab.js#L24
 (def TRANSITION-DURATION 150)
 
 (defn Tabs
