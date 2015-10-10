@@ -51,8 +51,6 @@
                (fn [x]
                  (reset! app-state x))]]])
 
-(reagent/render-component [hello-world] (. js/document (getElementById "app")))
-
 (defn mount-root
   []
   (reagent/render [hello-world] (.getElementById js/document "app")))
