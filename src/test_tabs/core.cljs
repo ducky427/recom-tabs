@@ -10,28 +10,32 @@
 (def TRANSITION-DURATION 150)
 
 (defn Tab
-  [content]
-  (let [animate  (reagent/atom false)]
-    (reagent/create-class
-     {:component-did-mount (fn []
-                             (js/setTimeout #(reset! animate true) TRANSITION-DURATION))
-      :reagent-render
-      (fn [content]
-        [:div.tab-pane.fade
-         {:class (when @animate
-                   "active in")}
-         content])})))
+  ([content]
+   [Tab content true])
+  ([content is-active?]
+   (let [animate  (reagent/atom false)]
+     (fn [content is-active?]
+       (if is-active?
+         (js/setTimeout #(reset! animate true) TRANSITION-DURATION)
+         (reset! animate false))
+       [:div.tab-pane.fade
+        {:class (when @animate
+                  "active in")}
+        content]))))
 
 (defn Tabs
   [tabs model on-change]
-  (let [contents  (into {} (map #(vector (:id %) (:content %)) tabs))]
-    [rcc/v-box
-     :children [[rcc/horizontal-tabs
-                 :tabs tabs
-                 :model model
-                 :on-change (fn [x]
-                              (on-change x))]
-                ^{:key model} [Tab (model contents)]]]))
+  [rcc/v-box
+   :children [[rcc/horizontal-tabs
+               :tabs tabs
+               :model model
+               :on-change (fn [x]
+                            (on-change x))]
+              [:div.tab-content
+               (for [t  tabs]
+                 ^{:key (:id t)} [Tab (:content t) (= (:id t) model)])]
+              [rcc/line]
+              ^{:key model} [Tab [:p (name model)]]]])
 
 (defn hello-world
   []
