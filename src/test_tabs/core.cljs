@@ -9,33 +9,29 @@
 ;; https://github.com/twbs/bootstrap/blob/master/js/tab.js#L24
 (def TRANSITION-DURATION 150)
 
+(defn Tab
+  [content]
+  (let [animate  (reagent/atom false)]
+    (reagent/create-class
+     {:component-did-mount (fn []
+                             (js/setTimeout #(reset! animate true) TRANSITION-DURATION))
+      :reagent-render
+      (fn [content]
+        [:div.tab-pane.fade
+         {:class (when @animate
+                   "active in")}
+         content])})))
+
 (defn Tabs
   [tabs model on-change]
-  (let [states  (reagent/atom (into {} (map
-                                        (fn [{x :id}]
-                                          [x (if (= model x)
-                                               "active in"
-                                               "")])
-                                        tabs)))]
-    (fn [tabs model on-change]
-      [rcc/v-box
-       :children [[rcc/horizontal-tabs
-                   :tabs tabs
-                   :model model
-                   :on-change (fn [x]
-                                (on-change x)
-                                (when-not (= x model)
-                                  (swap! states assoc model "")
-                                  (js/setTimeout #(swap! states assoc x "active in")
-                                                 TRANSITION-DURATION)))]
-                  [:div.tab-content
-                   (doall
-                    (for [t  tabs
-                          :let [k (:id t)]]
-                      ^{:key k}
-                      [rcc/box
-                       :class (str "tab-pane fade " (k @states))
-                       :child (:content t)]))]]])))
+  (let [contents  (into {} (map #(vector (:id %) (:content %)) tabs))]
+    [rcc/v-box
+     :children [[rcc/horizontal-tabs
+                 :tabs tabs
+                 :model model
+                 :on-change (fn [x]
+                              (on-change x))]
+                ^{:key model} [Tab (model contents)]]]))
 
 (defn hello-world
   []
